@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Perpustakaan SMAN 5 Garut</title>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <h1>📚 Perpustakaan SMAN 5 Garut</h1>
+
+  <div id="login">
+    <h2>Login Admin</h2>
+    <input id="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+  </div>
+
+  <div id="admin" style="display:none;">
+    <h2>Tambah Buku</h2>
+    <input id="judul" placeholder="Judul">
+    <input id="penulis" placeholder="Penulis">
+    <button onclick="tambahBuku()">Simpan</button>
+
+    <h2>Daftar Buku</h2>
+    <ul id="daftarBuku"></ul>
+  </div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "ISI_DARI_FIREBASE",
+    authDomain: "ISI_DARI_FIREBASE",
+    projectId: "ISI_DARI_FIREBASE",
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  function login() {
+    auth.signInWithEmailAndPassword(
+      document.getElementById("email").value,
+      document.getElementById("password").value
+    ).then(() => {
+      document.getElementById("login").style.display = "none";
+      document.getElementById("admin").style.display = "block";
+      loadBuku();
+    }).catch(alert);
+  }
+
+  function tambahBuku() {
+    db.collection("buku").add({
+      judul: document.getElementById("judul").value,
+      penulis: document.getElementById("penulis").value
+    }).then(loadBuku);
+  }
+
+  function loadBuku() {
+    const list = document.getElementById("daftarBuku");
+    list.innerHTML = "";
+    db.collection("buku").get().then(snapshot => {
+      snapshot.forEach(doc => {
+        const li = document.createElement("li");
+        li.textContent = doc.data().judul + " - " + doc.data().penulis;
+        list.appendChild(li);
+      });
+    });
+  }
+</script>
+</body>
+</html>
+
